@@ -7,32 +7,44 @@ Modified on Tue Jul 25 16:33:44 2017
 #导入数据
 import tensorflow.examples.tutorials.mnist.input_data as input_data
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
+
 #导入tensorflow
 import tensorflow as tf
+
 #x不是一个特定的值，而是一个占位符placeholder，我们在TensorFlow运行计算时输入这个值。我们希望能够输入任意数量的MNIST图像，每一张图展平成784维的向量。我们用2维的浮点数张量来表示这些图，这个张量的形状是[None，784 ]。（这里的None表示此张量的第一个维度可以是任何长度的。）
 x = tf.placeholder("float", [None, 784])
+
 #我们的模型也需要权重值和偏置量，当然我们可以把它们当做是另外的输入（使用占位符），但TensorFlow有一个更好的方法来表示它们：Variable 。 一个Variable代表一个可修改的张量，存在在TensorFlow的用于描述交互性操作的图中。它们可以用于计算输入值，也可以在计算中被修改。对于各种机器学习应用，一般都会有模型参数，可以用Variable表示。
 W = tf.Variable(tf.zeros([784,10]))
 b = tf.Variable(tf.zeros([10]))
+
 #实现模型
 y = tf.nn.softmax(tf.matmul(x,W) + b)
+
 #为了计算交叉熵，我们首先需要添加一个新的占位符用于输入正确值：
 y_ = tf.placeholder("float", [None,10])
+
 #计算交叉熵
 cross_entropy = -tf.reduce_sum(y_*tf.log(y))
+
 #用梯度下降法开始训练
 train_step = tf.train.GradientDescentOptimizer(0.01).minimize(cross_entropy)
+
 #初始化所以变量
 init = tf.initialize_all_variables()
 sess = tf.Session()
 sess.run(init)
+
 #开始训练模型，让其循环1000次
 for i in range(1000):
   batch_xs, batch_ys = mnist.train.next_batch(100)
   sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})
+
 #预测是否真实标签匹配
 correct_prediction = tf.equal(tf.argmax(y,1), tf.argmax(y_,1))
+
 #为了确定正确预测项的比例，我们可以把布尔值转换成浮点数，然后取平均值。
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+
 #打印正确率
 print (sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
