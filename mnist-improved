@@ -1,0 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+Modified on Tue Jul 25 18:25:19 2017
+
+@author: 周宇
+"""
+#导入数据
+import tensorflow.examples.tutorials.mnist.input_data as input_data
+mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
